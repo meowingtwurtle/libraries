@@ -9,4 +9,4 @@ add_library(__RC_Util INTERFACE)
 target_include_directories(__RC_Util INTERFACE include)
 add_library(RandomCat::Util ALIAS __RC_Util)
 
-target_link_libraries(__RC_All INTERFACE RandomCat::Util)
+target_link_libraries(__RC_AllLib INTERFACE RandomCat::Util)

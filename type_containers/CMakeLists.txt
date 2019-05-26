@@ -9,4 +9,4 @@ add_library(__RC_TypeContainer INTERFACE)
 target_include_directories(__RC_TypeContainer INTERFACE include)
 add_library(RandomCat::TypeContainer ALIAS __RC_TypeContainer)
 
-target_link_libraries(__RC_All INTERFACE RandomCat::TypeContainer)
+target_link_libraries(__RC_AllLib INTERFACE RandomCat::TypeContainer)
