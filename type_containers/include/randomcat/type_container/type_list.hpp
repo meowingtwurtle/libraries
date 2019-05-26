@@ -295,6 +295,22 @@ namespace randomcat::type_container {
         
         template<typename L, template<typename...> typename TT>
         using type_list_substitute_args_into_template_t = type_list_substitute_args_into_template<L, TT>;
+        
+        template<typename L, typename T>
+        struct type_list_first_index_of;
+        
+        template<typename... LRest, typename T>
+        struct type_list_first_index_of<type_list<T, LRest...>, T> {
+            static constexpr auto value = 0;
+        };
+        
+        template<typename LFirst, typename... LRest, typename T>
+        struct type_list_first_index_of<type_list<LFirst, LRest...>, T> {
+            static constexpr auto value = 1 + type_list_first_index_of<type_list<LRest...>, T>::value;
+        };
+        
+        template<typename L, typename T>
+        inline constexpr auto type_list_first_index_of_v = type_list_first_index_of<L, T>::value;
     }
     
     template<typename L, type_list_detail::type_list_index_t I>
@@ -371,6 +387,9 @@ namespace randomcat::type_container {
     
     template<typename Lsub, typename Llarge>
     inline auto constexpr type_list_is_sub_list_of_v = type_list_is_empty_v<type_list_remove_if_t<Lsub, type_list_detail::is_element_of<type_list_detail::require_type_list_t<Llarge>>::template value_for>>;
+    
+    template<typename L, typename T>
+    inline auto constexpr type_list_first_index_of_v = type_list_detail::type_list_first_index_of_v<type_list_detail::require_type_list_t<L>, T>;
     
     template<typename L, template<typename...> typename TT>
     using type_list_substitute_args_into_template_t = type_list_detail::type_list_substitute_args_into_template_t<type_list_detail::require_type_list_t<L>, TT>;
