@@ -8,3 +8,4 @@ add_library(RandomCat::All ALIAS __RC_All)
 
 add_subdirectory(type_containers)
 add_subdirectory(units)
+add_subdirectory(util)
