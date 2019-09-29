@@ -411,6 +411,16 @@ namespace randomcat::units {
     template<typename Rep1, typename Unit1, typename Rep2, typename Unit2> \
     constexpr bool operator OP (quantity<Rep1, Unit1> const& _first, quantity<Rep2, Unit2> const& _second) noexcept { \
         return detail::with_common_counts(_first, _second, [](auto x, auto y) constexpr noexcept { return x OP y; }); \
+    } \
+    \
+    template<typename QuantityRep, typename QuantityUnit, typename ValueRep, typename = std::enable_if_t<!is_quantity_v<ValueRep> && unit_is_unitless_v<QuantityUnit> && std::ratio_equal_v<detail::unit_scale_t<QuantityUnit>, std::ratio<1, 1>>>> \
+    constexpr bool operator OP (quantity<QuantityRep, QuantityUnit> const& _quantity, ValueRep const& _value) {\
+        return (_quantity.count()) OP _value; \
+    } \
+    \
+    template<typename ValueRep, typename QuantityRep, typename QuantityUnit, typename = std::enable_if_t<!is_quantity_v<ValueRep> && unit_is_unitless_v<QuantityUnit> && std::ratio_equal_v<detail::unit_scale_t<QuantityUnit>, std::ratio<1, 1>>>> \
+    constexpr bool operator OP (ValueRep const& _value, quantity<QuantityRep, QuantityUnit> const& _quantity) {\
+        return _value OP _quantity.count(); \
     }
 
     RC_QUANTITY_COMPARE_OP(==);
