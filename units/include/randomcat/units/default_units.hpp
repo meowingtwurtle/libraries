@@ -3,17 +3,17 @@
 #include <randomcat/units/units.hpp>
 
 namespace randomcat::units {
-    inline namespace default_units {
-        namespace default_units_detail {
-            using pi_ratio = std::ratio<1068966896, 340262731>;
-            
-            using integer_rep = std::int64_t;
-            using fractional_rep = double;
-        }
+    namespace detail {
+        using pi_ratio = std::ratio<1068966896, 340262731>;
 
+        using default_integer_rep = std::int64_t;
+        using default_fractional_rep = double;
+    }
+    
+    inline namespace default_units {
 #define RC_UNIT_DEF_REP(rep, unit_name, ...) using unit_name##_unit = __VA_ARGS__; using unit_name = quantity<rep, unit_name##_unit>;
-#define RC_INT_UNIT_DEF(unit_name, ...) RC_UNIT_DEF_REP(default_units_detail::integer_rep, unit_name, __VA_ARGS__);
-#define RC_FRAC_UNIT_DEF(unit_name, ...) RC_UNIT_DEF_REP(default_units_detail::fractional_rep, unit_name, __VA_ARGS__);
+#define RC_INT_UNIT_DEF(unit_name, ...) RC_UNIT_DEF_REP(detail::default_integer_rep, unit_name, __VA_ARGS__);
+#define RC_FRAC_UNIT_DEF(unit_name, ...) RC_UNIT_DEF_REP(detail::default_fractional_rep, unit_name, __VA_ARGS__);
 #define RC_BASE_UNIT_DEF_REP(define_macro, unit_name, tag_name) define_macro(unit_name, simple_unit<::randomcat::units::detail::default_tags::tag_name##_tag>);
 #define RC_INT_BASE_UNIT_DEF(unit_name, tag_name) RC_BASE_UNIT_DEF_REP(RC_INT_UNIT_DEF, unit_name, tag_name);
 #define RC_FRAC_BASE_UNIT_DEF(unit_name, tag_name) RC_BASE_UNIT_DEF_REP(RC_FRAC_UNIT_DEF, unit_name, tag_name);
@@ -37,7 +37,7 @@ namespace randomcat::units {
         RC_INT_UNIT_DEF(yards, scale_unit<feet_unit, std::ratio<3, 1>>);
         RC_INT_UNIT_DEF(miles, scale_unit<feet_unit, std::ratio<5280, 1>>);
 
-        RC_FRAC_UNIT_DEF(degrees, scale_unit<radians_unit, std::ratio_divide<default_units_detail::pi_ratio, std::ratio<180, 1>>>);
+        RC_FRAC_UNIT_DEF(degrees, scale_unit<radians_unit, std::ratio_divide<detail::pi_ratio, std::ratio<180, 1>>>);
 
 #define RC_PREFIX_UNIT_DEF(base_unit, prefix, ...) RC_INT_UNIT_DEF(prefix##base_unit, scale_unit<base_unit##_unit, __VA_ARGS__>);
 #define RC_PREFIX_UNITS_DEF(base_unit) RC_PREFIX_UNIT_DEF(base_unit, milli, std::milli); RC_PREFIX_UNIT_DEF(base_unit, micro, std::micro); RC_PREFIX_UNIT_DEF(base_unit, kilo, std::kilo)
