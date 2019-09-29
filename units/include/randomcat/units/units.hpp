@@ -466,8 +466,7 @@ namespace randomcat::units {
     template<std::intmax_t Power, typename Rep, typename Unit>
     constexpr auto pow(quantity<Rep, Unit> const& _quantity) {
         using std::pow;
-        auto newCount = pow(_quantity.count(), Power);
-        return quantity<decltype(newCount), power_unit<Unit, Power>>(newCount);
+        return units::make_quantity<power_unit<Unit, Power>>(pow(_quantity.count(), Power));
     }
 
     template<typename Rep1, typename Unit1, typename Rep2, typename Unit2, typename = std::enable_if_t<unit_tags_are_equal_v<Unit1, Unit2>>>
