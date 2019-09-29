@@ -6,14 +6,14 @@ namespace randomcat::units {
     inline namespace default_units {
         namespace default_units_detail {
             using pi_ratio = std::ratio<1068966896, 340262731>;
+            
+            using integer_rep = std::int64_t;
+            using fractional_rep = double;
         }
 
-#define RC_INT_UNIT_REP int64_t
-#define RC_FRAC_UNIT_REP double
-
 #define RC_UNIT_DEF_REP(rep, unit_name, ...) using unit_name##_unit = __VA_ARGS__; using unit_name = quantity<rep, unit_name##_unit>;
-#define RC_INT_UNIT_DEF(unit_name, ...) RC_UNIT_DEF_REP(RC_INT_UNIT_REP, unit_name, __VA_ARGS__);
-#define RC_FRAC_UNIT_DEF(unit_name, ...) RC_UNIT_DEF_REP(RC_FRAC_UNIT_REP, unit_name, __VA_ARGS__);
+#define RC_INT_UNIT_DEF(unit_name, ...) RC_UNIT_DEF_REP(default_units_detail::integer_rep, unit_name, __VA_ARGS__);
+#define RC_FRAC_UNIT_DEF(unit_name, ...) RC_UNIT_DEF_REP(default_units_detail::fractional_rep, unit_name, __VA_ARGS__);
 #define RC_BASE_UNIT_DEF_REP(define_macro, unit_name, tag_name) define_macro(unit_name, simple_unit<::randomcat::units::detail::default_tags::tag_name##_tag>);
 #define RC_INT_BASE_UNIT_DEF(unit_name, tag_name) RC_BASE_UNIT_DEF_REP(RC_INT_UNIT_DEF, unit_name, tag_name);
 #define RC_FRAC_BASE_UNIT_DEF(unit_name, tag_name) RC_BASE_UNIT_DEF_REP(RC_FRAC_UNIT_DEF, unit_name, tag_name);
@@ -62,8 +62,6 @@ namespace randomcat::units {
 #undef RC_PREFIX_UNIT_DEF
 #undef RC_INT_BASE_UNIT_DEF
 #undef RC_INT_UNIT_DEF
-#undef RC_FRAC_UNIT_REP
-#undef RC_INT_UNIT_REP
         
         inline auto sin(radians _angle) noexcept {
             return std::sin(_angle.count());
@@ -142,7 +140,7 @@ namespace randomcat::units {
     static_assert(default_units::feet(5280 * 2) == default_units::miles(2));
 
     // Cannot static_assert abs/min/max because not constexpr in standard c++
-    
+
     static_assert(make_quantity<default_units::seconds_unit>(5) == default_units::seconds(5));
     static_assert(make_quantity<default_units::seconds_unit>(0.00765) == default_units::microseconds(7650));
 }
