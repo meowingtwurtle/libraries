@@ -20,8 +20,7 @@ namespace randomcat::units {
     }
 
     template<typename Rep1, typename Unit1, typename Rep2, typename Unit2, typename = std::enable_if_t<unit_tags_are_equal_v<Unit1, Unit2>>>
-    constexpr std::common_type_t<quantity<Rep1, Unit1>, quantity<Rep2, Unit2>> operator+(quantity<Rep1, Unit1> const& _first,
-                                                                                         quantity<Rep2, Unit2> const& _second) noexcept {
+    constexpr auto operator+(quantity<Rep1, Unit1> const& _first, quantity<Rep2, Unit2> const& _second) noexcept {
         using common = std::common_type_t<quantity<Rep1, Unit1>, quantity<Rep2, Unit2>>;
         return common(common(_first).count() + common(_second).count());
     }
