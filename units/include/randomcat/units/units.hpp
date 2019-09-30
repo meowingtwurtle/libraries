@@ -417,7 +417,7 @@ namespace randomcat::units {
             typename = std::enable_if_t<unit_tags_are_equal_v<Unit1, Unit2>>,
             typename Compare
         >
-        constexpr decltype(auto) with_common_counts(quantity<Rep1, Unit1> const& _first, quantity<Rep2, Unit2> const& _second, Compare _comp) noexcept {
+        constexpr auto with_common_counts(quantity<Rep1, Unit1> const& _first, quantity<Rep2, Unit2> const& _second, Compare _comp) noexcept {
             using common_quantity = std::common_type_t<quantity<Rep1, Unit1>, quantity<Rep2, Unit2>>;
             using common_rep = quantity_rep_t<common_quantity>;
 
@@ -430,7 +430,7 @@ namespace randomcat::units {
 #define RC_QUANTITY_COMPARE_OP(OP) \
     \
     template<typename Rep1, typename Unit1, typename Rep2, typename Unit2> \
-    constexpr bool operator OP (quantity<Rep1, Unit1> const& _first, quantity<Rep2, Unit2> const& _second) noexcept { \
+    constexpr auto operator OP (quantity<Rep1, Unit1> const& _first, quantity<Rep2, Unit2> const& _second) noexcept { \
         return detail::with_common_counts(_first, _second, [](auto x, auto y) constexpr noexcept { return x OP y; }); \
     }
 
