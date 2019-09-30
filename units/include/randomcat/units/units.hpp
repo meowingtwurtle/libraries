@@ -445,6 +445,11 @@ namespace randomcat::units {
     constexpr auto make_quantity(Rep&& _value) noexcept(noexcept(quantity<std::decay_t<Rep>, Unit>(std::forward<Rep>(_value)))) {
         return quantity<std::decay_t<Rep>, Unit>(std::forward<Rep>(_value));
     }
+    
+    template<typename Rep>
+    constexpr auto unitless_quantity(Rep&& _value) noexcept(noexcept(make_quantity<no_unit>(std::forward<Rep>(_value)))) {
+        return make_quantity<no_unit>(std::forward<Rep>(_value));
+    }
 
     template<typename Rep, typename Unit>
     constexpr quantity<Rep, Unit> abs(quantity<Rep, Unit> _q) {
