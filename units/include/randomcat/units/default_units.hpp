@@ -8,49 +8,76 @@ namespace randomcat::units {
 
         using default_integer_rep = std::int64_t;
         using default_fractional_rep = double;
+
+        template<typename Quantity, typename Scale>
+        using scale_quantity = quantity<quantity_rep_t<Quantity>, scale_unit<quantity_unit_t<Quantity>, Scale>>;
     }
     
     inline namespace default_units {
-#define RC_UNIT_DEF_REP(rep, unit_name, ...) using unit_name##_unit = __VA_ARGS__; using unit_name = quantity<rep, unit_name##_unit>;
-#define RC_INT_UNIT_DEF(unit_name, ...) RC_UNIT_DEF_REP(detail::default_integer_rep, unit_name, __VA_ARGS__);
-#define RC_FRAC_UNIT_DEF(unit_name, ...) RC_UNIT_DEF_REP(detail::default_fractional_rep, unit_name, __VA_ARGS__);
-#define RC_BASE_UNIT_DEF_REP(define_macro, unit_name, tag_name) define_macro(unit_name, simple_unit<::randomcat::units::detail::default_tags::tag_name##_tag>);
-#define RC_INT_BASE_UNIT_DEF(unit_name, tag_name) RC_BASE_UNIT_DEF_REP(RC_INT_UNIT_DEF, unit_name, tag_name);
-#define RC_FRAC_BASE_UNIT_DEF(unit_name, tag_name) RC_BASE_UNIT_DEF_REP(RC_FRAC_UNIT_DEF, unit_name, tag_name);
+        using seconds_unit = simple_unit<detail::default_tags::time_tag>;
+        using seconds = quantity<detail::default_integer_rep, seconds_unit>;
 
-        RC_INT_BASE_UNIT_DEF (seconds, time);
-        RC_INT_BASE_UNIT_DEF (amperes, current);
-        RC_INT_BASE_UNIT_DEF (kelvins, temperature);
-        RC_INT_BASE_UNIT_DEF (meters, distance);
-        RC_INT_BASE_UNIT_DEF (kilograms, mass);
-        RC_INT_BASE_UNIT_DEF (candelas, luminous_intensity);
-        RC_FRAC_BASE_UNIT_DEF(radians, angle);
+        using amperes_unit = simple_unit<detail::default_tags::current_tag>;
+        using amperes = quantity<detail::default_integer_rep, amperes_unit>;
 
-        RC_INT_UNIT_DEF(newtons, product_unit<kilograms_unit, quotient_unit<meters_unit, power_unit<seconds_unit, 2>>>);
-        RC_INT_UNIT_DEF(joules, product_unit<newtons_unit, meters_unit>);
-        RC_INT_UNIT_DEF(watts, quotient_unit<joules_unit, seconds_unit>);
-        RC_INT_UNIT_DEF(volts, quotient_unit<watts_unit, amperes_unit>);
-        RC_INT_UNIT_DEF(ohms, quotient_unit<volts_unit, amperes_unit>);
+        using kelvins_unit = simple_unit<detail::default_tags::temperature_tag>;
+        using kelvins = quantity<detail::default_integer_rep, kelvins_unit>;
 
-        RC_INT_UNIT_DEF(inches, scale_unit<meters_unit, std::ratio<254, 10000>>);
-        RC_INT_UNIT_DEF(feet, scale_unit<inches_unit, std::ratio<12, 1>>);
-        RC_INT_UNIT_DEF(yards, scale_unit<feet_unit, std::ratio<3, 1>>);
-        RC_INT_UNIT_DEF(miles, scale_unit<feet_unit, std::ratio<5280, 1>>);
+        using meters_unit = simple_unit<detail::default_tags::distance_tag>;
+        using meters = quantity<detail::default_integer_rep, meters_unit>;
 
-        RC_FRAC_UNIT_DEF(degrees, scale_unit<radians_unit, std::ratio_divide<detail::pi_ratio, std::ratio<180, 1>>>);
+        using kilograms_unit = simple_unit<detail::default_tags::mass_tag>;
+        using kilograms = quantity<detail::default_integer_rep, kilograms_unit>;
 
-#define RC_PREFIX_UNIT_DEF(base_unit, prefix, ...) RC_INT_UNIT_DEF(prefix##base_unit, scale_unit<base_unit##_unit, __VA_ARGS__>);
-#define RC_PREFIX_UNITS_DEF(base_unit) RC_PREFIX_UNIT_DEF(base_unit, milli, std::milli); RC_PREFIX_UNIT_DEF(base_unit, micro, std::micro); RC_PREFIX_UNIT_DEF(base_unit, kilo, std::kilo)
+        using candelas_unit = simple_unit<detail::default_tags::luminous_intensity_tag>;
+        using candelas = quantity<detail::default_integer_rep, candelas_unit>;
+
+        using radians_unit = simple_unit<detail::default_tags::angle_tag>;
+        using radians = quantity<detail::default_fractional_rep, radians_unit>;
+
+        using newtons_unit = product_unit<kilograms_unit, quotient_unit<meters_unit, power_unit<seconds_unit, 2>>>;
+        using newtons = quantity<detail::default_integer_rep, newtons_unit>;
+
+        using joules_unit = product_unit<newtons_unit, meters_unit>;
+        using joules = quantity<detail::default_integer_rep, joules_unit>;
+
+        using watts_unit = quotient_unit<joules_unit, seconds_unit>;
+        using watts = quantity<detail::default_integer_rep, watts_unit>;
+
+        using volts_unit = quotient_unit<watts_unit, amperes_unit>;
+        using volts = quantity<detail::default_integer_rep, volts_unit>;
+
+        using ohms_unit = quotient_unit<volts_unit, amperes_unit>;
+        using ohms = quantity<detail::default_integer_rep, ohms_unit>;
+
+        using inches_unit = scale_unit<meters_unit, std::ratio<254, 10000>>;
+        using inches = quantity<detail::default_integer_rep, inches_unit>;
+
+        using feet_unit = scale_unit<inches_unit, std::ratio<12, 1>>;
+        using feet = quantity<detail::default_integer_rep, feet_unit>;
+
+        using yards_unit = scale_unit<feet_unit, std::ratio<3, 1>>;
+        using yards = quantity<detail::default_integer_rep, yards_unit>;
+
+        using miles_unit = scale_unit<feet_unit, std::ratio<5280, 1>>;
+        using miles = quantity<detail::default_integer_rep, miles_unit>;
+
+        using degrees_unit = scale_unit<radians_unit, std::ratio_divide<detail::pi_ratio, std::ratio<180, 1>>>;
+        using degrees = quantity<detail::default_fractional_rep, degrees_unit>;
+
+#define RC_PREFIX_UNIT_DEF(base_unit, prefix, ratio)                                                                                       \
+    using prefix##base_unit##_unit = scale_unit<base_unit##_unit, ratio>;                                                                  \
+    using prefix##base_unit = detail::scale_quantity<base_unit, ratio>;
+
+#define RC_PREFIX_UNITS_DEF(base_unit)                                                                                                     \
+    RC_PREFIX_UNIT_DEF(base_unit, milli, std::milli);                                                                                      \
+    RC_PREFIX_UNIT_DEF(base_unit, micro, std::micro);                                                                                      \
+    RC_PREFIX_UNIT_DEF(base_unit, kilo, std::kilo);
 
         RC_PREFIX_UNITS_DEF(seconds);
         RC_PREFIX_UNITS_DEF(amperes);
         RC_PREFIX_UNITS_DEF(kelvins);
         RC_PREFIX_UNITS_DEF(meters);
-
-        using grams_unit = scale_unit<kilograms_unit, std::ratio<1, 1000>>;
-        RC_PREFIX_UNIT_DEF(grams, milli, std::milli);
-        RC_PREFIX_UNIT_DEF(grams, micro, std::micro);
-
         RC_PREFIX_UNITS_DEF(candelas);
         RC_PREFIX_UNITS_DEF(newtons);
         RC_PREFIX_UNITS_DEF(joules);
@@ -60,8 +87,15 @@ namespace randomcat::units {
 
 #undef RC_PREFIX_UNITS_DEF
 #undef RC_PREFIX_UNIT_DEF
-#undef RC_INT_BASE_UNIT_DEF
-#undef RC_INT_UNIT_DEF
+
+        using grams_unit = scale_unit<kilograms_unit, std::ratio<1, 1000>>;
+        using grams = detail::scale_quantity<kilograms, std::ratio<1, 1000>>;
+
+        using milligrams_unit = scale_unit<grams_unit, std::milli>;
+        using milligrams = detail::scale_quantity<grams, std::milli>;
+
+        using micrograms_unit = scale_unit<grams_unit, std::micro>;
+        using micrograms = detail::scale_quantity<grams, std::micro>;
         
         inline auto sin(radians _angle) noexcept {
             return std::sin(_angle.count());
