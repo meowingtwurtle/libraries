@@ -1,6 +1,10 @@
 #pragma once
 
-#include <randomcat/units/units.hpp>
+#include <cstdint>
+
+#include "randomcat/units/quantity.hpp"
+#include "randomcat/units/quantity_traits.hpp"
+#include "randomcat/units/detail/default_tags.hpp"
 
 namespace randomcat::units {
     namespace detail {
