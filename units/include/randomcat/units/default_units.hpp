@@ -179,6 +179,6 @@ namespace randomcat::units {
 
     // Cannot static_assert abs/min/max because not constexpr in standard c++
 
-    static_assert(make_quantity<default_units::seconds_unit>(5) == default_units::seconds(5));
-    static_assert(make_quantity<default_units::seconds_unit>(0.00765) == default_units::microseconds(7650));
+    static_assert(units::make_quantity<default_units::seconds_unit>(5) == default_units::seconds(5));
+    static_assert(units::make_quantity<default_units::seconds_unit>(0.00765) == default_units::microseconds(7650));
 }

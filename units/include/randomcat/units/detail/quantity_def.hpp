@@ -85,7 +85,7 @@ namespace randomcat::units {
         template<typename Rep2,
                  typename Unit2,
                  typename = std::enable_if_t<unit_tags_are_equal_v<Unit, Unit2> && (std::chrono::treat_as_floating_point_v<Rep> || (std::ratio_divide<detail::unit_scale_t<Unit2>, detail::unit_scale_t<Unit>>::den == 1))>>
-        constexpr quantity(quantity<Rep2, Unit2> const& _other) noexcept : m_value{quantity_cast<quantity>(_other).count()} {}
+        constexpr quantity(quantity<Rep2, Unit2> const& _other) noexcept : m_value{units::quantity_cast<quantity>(_other).count()} {}
 
         template<bool Enable = is_time>
         /* implicit */ constexpr quantity(std::enable_if_t<Enable, chrono_type> const& _asChrono) noexcept : m_value{_asChrono.count()} {}
@@ -140,8 +140,8 @@ namespace randomcat::units {
     }
 
     template<typename Rep>
-    constexpr auto unitless_quantity(Rep&& _value) noexcept(noexcept(make_quantity<no_unit>(std::forward<Rep>(_value)))) {
-        return make_quantity<no_unit>(std::forward<Rep>(_value));
+    constexpr auto unitless_quantity(Rep&& _value) noexcept(noexcept(units::make_quantity<no_unit>(std::forward<Rep>(_value)))) {
+        return units::make_quantity<no_unit>(std::forward<Rep>(_value));
     }
 }    // namespace randomcat::units
 

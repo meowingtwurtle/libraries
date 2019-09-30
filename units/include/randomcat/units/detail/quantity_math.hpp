@@ -10,7 +10,7 @@ namespace randomcat::units {
     template<typename Rep, typename Unit>
     constexpr auto abs(quantity<Rep, Unit> _q) {
         using std::abs;
-        return make_quantity<Unit>(abs(_q.count()));
+        return units::make_quantity<Unit>(abs(_q.count()));
     }
 
     template<std::intmax_t Power, typename Rep, typename Unit>
@@ -27,17 +27,17 @@ namespace randomcat::units {
 
     template<typename Rep1, typename Unit1, typename Rep2, typename Unit2>
     constexpr auto operator*(quantity<Rep1, Unit1> const& _first, quantity<Rep2, Unit2> const& _second) noexcept {
-        return make_quantity<product_unit<Unit1, Unit2>>(_first.count() * _second.count());
+        return units::make_quantity<product_unit<Unit1, Unit2>>(_first.count() * _second.count());
     }
 
     template<typename ValueRep, typename QuantityRep, typename Unit, typename = std::enable_if_t<!is_quantity_v<ValueRep>>>
     constexpr auto operator*(ValueRep const& _val, quantity<QuantityRep, Unit> const& _quantity) noexcept {
-        return unitless_quantity(_val) * _quantity;
+        return units::unitless_quantity(_val) * _quantity;
     }
 
     template<typename ValueRep, typename QuantityRep, typename Unit, typename = std::enable_if_t<!is_quantity_v<ValueRep>>>
     constexpr auto operator*(quantity<QuantityRep, Unit> const& _quantity, ValueRep const& _val) noexcept {
-        return _quantity * unitless_quantity(_val);
+        return _quantity * units::unitless_quantity(_val);
     }
 
     template<typename Rep1, typename Unit1, typename Rep2, typename Unit2>
@@ -60,6 +60,6 @@ namespace randomcat::units {
 
     template<typename ValueRep, typename QuantityRep, typename QuantityUnit, typename = std::enable_if_t<!is_quantity_v<ValueRep>>>
     constexpr auto operator/(quantity<QuantityRep, QuantityUnit> const& _q, ValueRep const& _v) {
-        return _q / unitless_quantity(_v);
+        return _q / units::unitless_quantity(_v);
     }
 }    // namespace randomcat::units
