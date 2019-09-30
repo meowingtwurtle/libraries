@@ -454,9 +454,9 @@ namespace randomcat::units {
     }
 
     template<typename Rep, typename Unit>
-    constexpr quantity<Rep, Unit> abs(quantity<Rep, Unit> _q) {
+    constexpr auto abs(quantity<Rep, Unit> _q) {
         using std::abs;
-        return quantity{abs(_q.count())};
+        return make_quantity<Unit>(abs(_q.count()));
     }
     
     template<
@@ -468,10 +468,9 @@ namespace randomcat::units {
     >
     constexpr auto min(quantity<Rep1, Unit1> const& _first, quantity<Rep2, Unit2> const& _second) {
         using common_quantity = std::common_type_t<quantity<Rep1, Unit1>, quantity<Rep2, Unit2>>;
-        using common_rep = detail::quantity_rep_t<common_quantity>;
-        
+
         using std::min;
-        return common_quantity{min(common_rep{common_quantity{_first}.count()}, common_rep{common_quantity{_second}.count()})};
+        return make_quantity<Unit1>(min(common_quantity{_first}.count(), common_quantity{_second}.count()));
     }
 
     template<
@@ -483,10 +482,9 @@ namespace randomcat::units {
     >
     constexpr auto max(quantity<Rep1, Unit1> const& _first, quantity<Rep2, Unit2> const& _second) {
         using common_quantity = std::common_type_t<quantity<Rep1, Unit1>, quantity<Rep2, Unit2>>;
-        using common_rep = detail::quantity_rep_t<common_quantity>;
 
         using std::max;
-        return common_quantity{max(common_rep{common_quantity{_first}.count()}, common_rep{common_quantity{_second}.count()})};
+        return make_quantity<Unit1>(max(common_quantity{_first}.count(), common_quantity{_second}.count()));
     }
 
     template<std::intmax_t Power, typename Rep, typename Unit>
