@@ -322,8 +322,6 @@ namespace randomcat::units {
         using rep = Rep;
         using unit = Unit;
 
-        using this_t = quantity;
-
         static_assert(std::is_nothrow_copy_constructible_v<Rep>);
         static_assert(std::is_nothrow_move_constructible_v<Rep>);
         static_assert(noexcept(std::declval<Rep>() + std::declval<Rep>()));
@@ -337,7 +335,7 @@ namespace randomcat::units {
         
         template<typename Rep2, typename Unit2, typename = std::enable_if_t<unit_tags_are_equal_v<Unit, Unit2> && (std::chrono::treat_as_floating_point_v<Rep> || (std::ratio_divide<detail::unit_scale_t<Unit2>, detail::unit_scale_t<Unit>>::den == 1))>>
         constexpr quantity(quantity<Rep2, Unit2> const& _other) noexcept
-        : m_value{quantity_cast<this_t>(_other).count()}
+        : m_value{quantity_cast<quantity>(_other).count()}
         {}
         
         template<bool Enable = is_time>
