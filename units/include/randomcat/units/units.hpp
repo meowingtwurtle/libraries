@@ -349,41 +349,31 @@ namespace randomcat::units {
         }
 
         template<typename OtherUnit, typename = std::enable_if_t<units_are_equal_v<Unit, OtherUnit>>>
-        constexpr quantity& operator+=(quantity<Rep, OtherUnit> const& _other) & noexcept {
-            static_assert(noexcept(m_value += _other.count()));
-
+        constexpr quantity& operator+=(quantity<Rep, OtherUnit> const& _other) & noexcept(noexcept(m_value += _other.count())) {
             m_value += _other.count();
             return *this;
         }
 
         template<typename OtherRep, typename OtherUnit, typename = std::enable_if_t<units_are_equal_v<Unit, OtherUnit>>>
-        constexpr quantity& operator-=(quantity<OtherRep, OtherUnit> const& _other) & noexcept {
-            static_assert(noexcept(m_value -= _other.count()));
-
+        constexpr quantity& operator-=(quantity<OtherRep, OtherUnit> const& _other) & noexcept(noexcept(m_value -= _other.count())) {
             m_value -= _other.count();
             return *this;
         }
 
         template<typename OtherRep, typename = std::enable_if_t<std::is_arithmetic_v<OtherRep>>>
-        constexpr quantity& operator*=(OtherRep const& _other) & noexcept {
-            static_assert(noexcept(m_value *= _other));
-            
+        constexpr quantity& operator*=(OtherRep const& _other) & noexcept(noexcept(m_value *= _other)) {
             m_value *= _other;
             return *this;
         }
 
         template<typename OtherRep, typename R = Rep, typename = std::enable_if_t<std::is_arithmetic_v<OtherRep> && std::is_floating_point_v<R>>>
-        constexpr quantity& operator/=(OtherRep const& _other) & noexcept {
-            static_assert(noexcept(m_value /= _other));
-
+        constexpr quantity& operator/=(OtherRep const& _other) & noexcept(noexcept(m_value /= _other)) {
             m_value /= _other;
             return *this;
         }
 
         template<typename OtherRep, typename = std::enable_if_t<std::is_integral_v<OtherRep>>>
-        constexpr quantity& operator%=(OtherRep const& _other) & noexcept {
-            static_assert(noexcept(m_value %= _other));
-
+        constexpr quantity& operator%=(OtherRep const& _other) & noexcept(noexcept(m_value %= _other)) {
             m_value %= _other;
             return *this;
         }
@@ -392,7 +382,7 @@ namespace randomcat::units {
             return *this;
         }
 
-        constexpr quantity operator-() const noexcept {
+        constexpr quantity operator-() const noexcept(noexcept(-m_value)) {
             return quantity{-m_value};
         }
 
