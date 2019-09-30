@@ -286,10 +286,29 @@ namespace randomcat::units {
                 return as_chrono();
             }
         };
+
+        template<typename Derived, typename Enable = void>
+        class unitless_quantity_base {};
+        
+        template<typename Rep, typename Unit>
+        class unitless_quantity_base<quantity<Rep, Unit>, std::enable_if_t<unit_is_unitless_v<Unit>>> {
+        private:
+            using derived = quantity<Rep, Unit>;
+            using scale = unit_scale_t<Unit>;
+
+            constexpr auto derived_this() const noexcept {
+                return static_cast<derived const*>(this);
+            }
+        
+        public:
+            constexpr operator auto() const noexcept(noexcept(derived_this()->count())) {
+                return derived_this()->count() * scale::num / scale::den;
+            }
+        };
     }
 
     template<typename Rep, typename Unit>
-    class quantity : public detail::chrono_quantity_base<quantity<Rep, Unit>> {
+    class quantity : public detail::chrono_quantity_base<quantity<Rep, Unit>>, public detail::unitless_quantity_base<quantity<Rep, Unit>> {
         static_assert(detail::is_unit_v<Unit>, "Unit must be a unit");
         static_assert(std::is_same_v<Rep, std::remove_cv_t<std::remove_reference_t<Rep>>>, "Rep cannot be cv qualified or a reference");
         static_assert(!is_quantity_v<Rep>, "Rep cannot be a quantity");
@@ -305,8 +324,6 @@ namespace randomcat::units {
 
         using this_t = quantity;
 
-        static auto constexpr is_unitless = unit_is_unitless_v<Unit>;
-        
         static_assert(std::is_nothrow_copy_constructible_v<Rep>);
         static_assert(std::is_nothrow_move_constructible_v<Rep>);
         static_assert(noexcept(std::declval<Rep>() + std::declval<Rep>()));
@@ -379,11 +396,6 @@ namespace randomcat::units {
             return quantity{-m_value};
         }
 
-        template<bool CanEnable = is_unitless && std::ratio_equal_v<detail::unit_scale_t<Unit>, std::ratio<1, 1>>, typename = std::enable_if_t<CanEnable>>
-        constexpr operator Rep() noexcept {
-            return m_value;
-        }
-
     private:
         Rep m_value;
     };
@@ -428,16 +440,6 @@ namespace randomcat::units {
     template<typename Rep1, typename Unit1, typename Rep2, typename Unit2> \
     constexpr bool operator OP (quantity<Rep1, Unit1> const& _first, quantity<Rep2, Unit2> const& _second) noexcept { \
         return detail::with_common_counts(_first, _second, [](auto x, auto y) constexpr noexcept { return x OP y; }); \
-    } \
-    \
-    template<typename QuantityRep, typename QuantityUnit, typename ValueRep, typename = std::enable_if_t<!is_quantity_v<ValueRep> && unit_is_unitless_v<QuantityUnit> && std::ratio_equal_v<detail::unit_scale_t<QuantityUnit>, std::ratio<1, 1>>>> \
-    constexpr bool operator OP (quantity<QuantityRep, QuantityUnit> const& _quantity, ValueRep const& _value) {\
-        return (_quantity.count()) OP _value; \
-    } \
-    \
-    template<typename ValueRep, typename QuantityRep, typename QuantityUnit, typename = std::enable_if_t<!is_quantity_v<ValueRep> && unit_is_unitless_v<QuantityUnit> && std::ratio_equal_v<detail::unit_scale_t<QuantityUnit>, std::ratio<1, 1>>>> \
-    constexpr bool operator OP (ValueRep const& _value, quantity<QuantityRep, QuantityUnit> const& _quantity) {\
-        return _value OP _quantity.count(); \
     }
 
     RC_QUANTITY_COMPARE_OP(==);
