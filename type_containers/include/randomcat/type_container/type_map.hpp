@@ -236,7 +236,7 @@ namespace randomcat::type_container {
     public:
         
         static_assert(is_type_list_v<nodes>, "NodeL must be a type_list of type_map_node");
-        static_assert(nodes::template all_match<type_map_detail::template is_type_map_node>, "NodeL must be a type_list of type_map_node");
+        static_assert(type_list_all_match_v<NodeL, type_map_detail::template is_type_map_node>, "NodeL must be a type_list of type_map_node");
         
         static constexpr auto size = nodes::size;
         
