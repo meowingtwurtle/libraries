@@ -344,7 +344,7 @@ namespace randomcat::units {
         /* implicit */ constexpr quantity(std::enable_if_t<Enable, chrono_type> const& _asChrono) noexcept
         : m_value{_asChrono.count()} {}
 
-        constexpr Rep count() const noexcept {
+        constexpr auto count() const noexcept {
             return m_value;
         }
 
@@ -382,8 +382,10 @@ namespace randomcat::units {
             return *this;
         }
 
-        constexpr quantity operator-() const noexcept(noexcept(-m_value)) {
-            return quantity{-m_value};
+        constexpr auto operator-() const noexcept(noexcept(-m_value)) {
+            using result_rep = std::decay_t<decltype(-m_value)>;
+            
+            return quantity<result_rep, Unit>{-m_value};
         }
 
     private:
@@ -500,24 +502,22 @@ namespace randomcat::units {
     }
 
     template<typename Rep1, typename Unit1, typename Rep2, typename Unit2>
-    constexpr quantity<std::common_type_t<Rep1, Rep2>, product_unit<Unit1, Unit2>> operator*(quantity<Rep1, Unit1> const& _first, quantity<Rep2, Unit2> const& _second) noexcept {
-        using common_rep = std::common_type_t<Rep1, Rep2>;
-        using result = quantity<common_rep, product_unit<Unit1, Unit2>>;
-        return result(static_cast<common_rep>(_first.count()) * static_cast<common_rep>(_second.count()));
+    constexpr auto operator*(quantity<Rep1, Unit1> const& _first, quantity<Rep2, Unit2> const& _second) noexcept {
+        return make_quantity<product_unit<Unit1, Unit2>>(_first.count() * _second.count());
     }
 
     template<typename ValueRep, typename QuantityRep, typename Unit, typename = std::enable_if_t<!is_quantity_v<ValueRep>>>
-    constexpr decltype(auto) operator*(ValueRep const& _val, quantity<QuantityRep, Unit> const& _quantity) noexcept {
-        return _quantity * quantity<ValueRep, no_unit>{_val};
+    constexpr auto operator*(ValueRep const& _val, quantity<QuantityRep, Unit> const& _quantity) noexcept {
+        return unitless_quantity(_val) * _quantity;
     }
 
     template<typename ValueRep, typename QuantityRep, typename Unit, typename = std::enable_if_t<!is_quantity_v<ValueRep>>>
-    constexpr decltype(auto) operator*(quantity<QuantityRep, Unit> const& _quantity, ValueRep const& _val) noexcept {
-        return _val * _quantity;
+    constexpr auto operator*(quantity<QuantityRep, Unit> const& _quantity, ValueRep const& _val) noexcept {
+        return _quantity * unitless_quantity(_val);
     }
 
     template<typename Rep1, typename Unit1, typename Rep2, typename Unit2>
-    constexpr decltype(auto) operator-(quantity<Rep1, Unit1> const& _first, quantity<Rep2, Unit2> const& _second) noexcept {
+    constexpr auto operator-(quantity<Rep1, Unit1> const& _first, quantity<Rep2, Unit2> const& _second) noexcept {
         using common = std::common_type_t<quantity<Rep1, Unit1>, quantity<Rep2, Unit2>>;
         return common(common(_first).count() - common(_second).count());
     }
@@ -535,10 +535,7 @@ namespace randomcat::units {
     }
 
     template<typename ValueRep, typename QuantityRep, typename QuantityUnit, typename = std::enable_if_t<!is_quantity_v<ValueRep>>>
-    constexpr quantity<std::common_type_t<ValueRep, QuantityRep>, QuantityUnit> operator/(quantity<QuantityRep, QuantityUnit> const& _q, ValueRep const& _v) {
-        using common_rep = std::common_type_t<ValueRep, QuantityRep>;
-        using result = quantity<common_rep, QuantityUnit>;
-
-        return result{static_cast<common_rep>(_q.count()) / static_cast<common_rep>(_v)};
+    constexpr auto operator/(quantity<QuantityRep, QuantityUnit> const& _q, ValueRep const& _v) {
+        return _q / unitless_quantity(_v);
     }
 }
