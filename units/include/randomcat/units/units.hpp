@@ -452,8 +452,8 @@ namespace randomcat::units {
 #undef RC_QUANTITY_COMPARE_OP
 
     template<typename Unit, typename Rep>
-    constexpr auto make_quantity(Rep _value) noexcept {
-        return quantity<Rep, Unit>(_value);
+    constexpr auto make_quantity(Rep&& _value) noexcept(noexcept(quantity<std::decay_t<Rep>, Unit>(std::forward<Rep>(_value)))) {
+        return quantity<std::decay_t<Rep>, Unit>(std::forward<Rep>(_value));
     }
 
     template<typename Rep, typename Unit>
