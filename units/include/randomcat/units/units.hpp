@@ -256,17 +256,48 @@ namespace randomcat::units {
         struct luminous_intensity_tag {};
         struct angle_tag {};
     }
+    
+    namespace detail {
+        template<typename Derived, typename Enable = void>
+        class chrono_quantity_base {
+        public:
+            inline static constexpr auto is_time = false;
+            using chrono_type = void;
+        };
+        
+        using time_tag_map = detail::empty_tag_count_map::set<detail::default_tags::time_tag, 1>;
+        
+        template<typename Rep, typename Unit>
+        class chrono_quantity_base<quantity<Rep, Unit>, std::enable_if_t<detail::tag_maps_are_equal_v<detail::unit_tag_counts_t<Unit>, time_tag_map>>> {
+        private:
+            constexpr auto derived_this() const noexcept {
+                return static_cast<quantity<Rep, Unit> const*>(this);
+            }
+
+        public:
+            using chrono_type = std::chrono::duration<Rep, detail::unit_scale_t<Unit>>;
+            inline static constexpr auto is_time = true;
+
+            constexpr chrono_type as_chrono() const noexcept(noexcept(chrono_type(derived_this()->count()))) {
+                return chrono_type(derived_this()->count());
+            }
+
+            constexpr operator chrono_type() const noexcept(noexcept(as_chrono())) {
+                return as_chrono();
+            }
+        };
+    }
 
     template<typename Rep, typename Unit>
-    class quantity {
+    class quantity : public detail::chrono_quantity_base<quantity<Rep, Unit>> {
         static_assert(detail::is_unit_v<Unit>, "Unit must be a unit");
         static_assert(std::is_same_v<Rep, std::remove_cv_t<std::remove_reference_t<Rep>>>, "Rep cannot be cv qualified or a reference");
         static_assert(!is_quantity_v<Rep>, "Rep cannot be a quantity");
 
     private:
-        static auto constexpr is_time = detail::tag_maps_are_equal_v<detail::unit_tag_counts_t<Unit>, detail::empty_tag_count_map::set<detail::default_tags::time_tag, 1>>;
-        struct invalid_chrono {};
-        using as_chrono_type = std::conditional_t<is_time, std::chrono::duration<Rep, detail::unit_scale_t<Unit>>, invalid_chrono>;
+        using chrono_base = detail::chrono_quantity_base<quantity<Rep, Unit>>;
+        inline static constexpr auto is_time = chrono_base::is_time;
+        using chrono_type = typename chrono_base::chrono_type;
 
     public:
         using rep = Rep;
@@ -292,8 +323,8 @@ namespace randomcat::units {
         : m_value{quantity_cast<this_t>(_other).count()}
         {}
         
-        template<bool Enable = is_time, typename = std::enable_if_t<Enable>>
-        /* implicit */ constexpr quantity(as_chrono_type const& _asChrono) noexcept
+        template<bool Enable = is_time>
+        /* implicit */ constexpr quantity(std::enable_if_t<Enable, chrono_type> const& _asChrono) noexcept
         : m_value{_asChrono.count()} {}
 
         constexpr Rep count() const noexcept {
@@ -351,20 +382,6 @@ namespace randomcat::units {
         template<bool CanEnable = is_unitless && std::ratio_equal_v<detail::unit_scale_t<Unit>, std::ratio<1, 1>>, typename = std::enable_if_t<CanEnable>>
         constexpr operator Rep() noexcept {
             return m_value;
-        }
-
-    public:
-        constexpr operator as_chrono_type() noexcept {
-            return as_chrono();
-        }
-
-        template<bool Enable = is_time, typename = std::enable_if_t<Enable>>
-        constexpr as_chrono_type as_chrono() noexcept {
-            if constexpr (is_time) {
-                return as_chrono_type(count());
-            } else {
-                return void();
-            }
         }
 
     private:
