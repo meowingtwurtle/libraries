@@ -302,6 +302,8 @@ namespace randomcat::units {
         
         public:
             constexpr operator auto() const noexcept(noexcept(derived_this()->count())) {
+                static_assert(std::chrono::treat_as_floating_point_v<Rep> || (scale::den == 1), "Possible loss of precision in conversion.");
+
                 return derived_this()->count() * scale::num / scale::den;
             }
         };
