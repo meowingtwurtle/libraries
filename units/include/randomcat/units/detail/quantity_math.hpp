@@ -26,7 +26,7 @@ namespace randomcat::units {
 
     template<typename Rep1, typename Unit1, typename Rep2, typename Unit2>
     constexpr auto operator*(quantity<Rep1, Unit1> const& _first, quantity<Rep2, Unit2> const& _second) noexcept {
-        return units::make_quantity<product_unit<Unit1, Unit2>>(_first.count() * _second.count());
+        return quantity<std::common_type_t<Rep1, Rep2>, product_unit<Unit1, Unit2>>(_first.count() * _second.count());
     }
 
     template<typename ValueRep, typename QuantityRep, typename Unit, typename = std::enable_if_t<!is_quantity_v<ValueRep>>>
