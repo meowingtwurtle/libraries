@@ -8,9 +8,9 @@
 
 namespace randomcat::units {
     template<typename Rep, typename Unit>
-    constexpr auto abs(quantity<Rep, Unit> const& _q) {
+    constexpr quantity<Rep, Unit> abs(quantity<Rep, Unit> const& _q) {
         using std::abs;
-        return units::make_quantity<Unit>(abs(_q.count()));
+        return quantity<Rep, Unit>(abs(_q.count()));
     }
 
     template<std::intmax_t Power, typename Rep, typename Unit>
