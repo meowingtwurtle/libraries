@@ -45,19 +45,15 @@ namespace randomcat::units {
         return common{_first}.count() >= common{_second}.count();
     }
 
-    template<typename Rep1, typename Unit1, typename Rep2, typename Unit2, typename = std::enable_if_t<unit_tags_are_equal_v<Unit1, Unit2>>>
-    constexpr auto min(quantity<Rep1, Unit1> const& _first, quantity<Rep2, Unit2> const& _second) {
-        using common_quantity = std::common_type_t<quantity<Rep1, Unit1>, quantity<Rep2, Unit2>>;
-
+    template<typename Rep1, typename Unit1, typename Rep2, typename Unit2, typename = std::enable_if_t<unit_tags_are_equal_v<Unit1, Unit2>>, typename common = std::common_type_t<quantity<Rep1, Unit1>, quantity<Rep2, Unit2>>>
+    constexpr common min(quantity<Rep1, Unit1> const& _first, quantity<Rep2, Unit2> const& _second) {
         using std::min;
-        return common_quantity(min(common_quantity{_first}.count(), common_quantity{_second}.count()));
+        return common(min(common{_first}.count(), common{_second}.count()));
     }
 
-    template<typename Rep1, typename Unit1, typename Rep2, typename Unit2, typename = std::enable_if_t<unit_tags_are_equal_v<Unit1, Unit2>>>
-    constexpr auto max(quantity<Rep1, Unit1> const& _first, quantity<Rep2, Unit2> const& _second) {
-        using common_quantity = std::common_type_t<quantity<Rep1, Unit1>, quantity<Rep2, Unit2>>;
-
+    template<typename Rep1, typename Unit1, typename Rep2, typename Unit2, typename = std::enable_if_t<unit_tags_are_equal_v<Unit1, Unit2>>, typename common_quantity = std::common_type_t<quantity<Rep1, Unit1>, quantity<Rep2, Unit2>>>
+    constexpr common max(quantity<Rep1, Unit1> const& _first, quantity<Rep2, Unit2> const& _second) {
         using std::max;
-        return common_quantity(max(common_quantity{_first}.count(), common_quantity{_second}.count()));
+        return common(max(common{_first}.count(), common{_second}.count()));
     }
 }    // namespace randomcat::units
