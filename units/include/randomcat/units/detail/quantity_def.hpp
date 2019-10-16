@@ -67,6 +67,9 @@ namespace randomcat::units {
         inline static constexpr auto is_time = chrono_base::is_time;
         using chrono_type = typename chrono_base::chrono_type;
 
+    private:
+        Rep m_value;
+        
     public:
         using rep = Rep;
         using unit = Unit;
@@ -129,9 +132,6 @@ namespace randomcat::units {
 
             return quantity<result_rep, Unit>{-m_value};
         }
-
-    private:
-        Rep m_value;
     };
 
     template<typename Unit, typename Rep>
