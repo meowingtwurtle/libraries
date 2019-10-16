@@ -53,7 +53,7 @@ namespace randomcat::units {
         using first_scaled = quantity<common_rep, unit<detail::unit_tag_counts_t<Unit1>, scale_gcd>>;
         using second_scaled = quantity<common_rep, unit<detail::unit_tag_counts_t<Unit2>, scale_gcd>>;
 
-        return result{static_cast<common_rep>(first_scaled{_first}.count()) / static_cast<common_rep>(second_scaled{_second}.count())};
+        return quantity<common_rep, quotient_unit<Unit1, Unit2>>{common_rep(common_rep(first_scaled(_first).count()) / common_rep(second_scaled{_second}.count())};
     }
 
     template<typename ValueRep, typename QuantityRep, typename QuantityUnit, typename = std::enable_if_t<!is_quantity_v<ValueRep>>>
