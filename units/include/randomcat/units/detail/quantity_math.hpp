@@ -8,7 +8,7 @@
 
 namespace randomcat::units {
     template<typename Rep, typename Unit>
-    constexpr auto abs(quantity<Rep, Unit> _q) {
+    constexpr auto abs(quantity<Rep, Unit> const& _q) {
         using std::abs;
         return units::make_quantity<Unit>(abs(_q.count()));
     }
